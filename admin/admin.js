@@ -278,10 +278,10 @@ admin.post('/deleteimg', (req, res) => {
     
     chainFecth(sql,[Instance,Blog_Id]).then(data=>{
         //再删除服务器对应图片
-        // console.log('再删除服务器对应图片${ImgPath}')
         if(data){
-            if (fs.existsSync('.'+ImgPath)) {
-                fs.unlink(ImgPath.substr(1), function(err){
+            const fullname = './public'+ImgPath
+            if (fs.existsSync(fullname)) {
+                fs.unlink(fullname, function(err){
                     if(err){
                         throw err
                     }
