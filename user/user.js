@@ -235,7 +235,10 @@ user.post('/refeshtoken', (req, res) => {
 user.post('/blogslist', (req, res) => {
     let st = Number(req.body.start)
     let len = Number(req.body.length)
-    let sql = '(select * from blogs where Blog_Status=1 order by Blog_Id desc)  limit ?,?'
+    // let sql = '(select * from blogs where Blog_Status=1 order by Blog_Id desc)  limit ?,?'
+    let sql = '(select Blog_Id,Blog_Title,Blog_Summary,Blog_Tags,Blog_Class,'+
+    'Blog_Likes,Blog_Views,Blog_Collected,Blog_Comments,Blog_Author,Blog_Createtime,Blog_Updatetime '
+    +' from blogs where Blog_Status=1 order by Blog_Id desc)  limit ?,?'
     chainFecth(sql,[st,len]).then(data=>{res.send(data)}).catch(err=>{console.log(err)})
 })
 //博客列表count
@@ -251,7 +254,11 @@ user.post('/takeablog', (req, res) => {
         res.send([])
         return
     }
-    let sql = 'select *from blogs where Blog_Id=? and Blog_Status=1'
+    // let sql = 'select *from blogs where Blog_Id=? and Blog_Status=1'
+    let sql = 'select Blog_Id,Blog_Title,Blog_Content,Blog_Tags,Blog_Class,Blog_Likes,'+
+    'Blog_Views,Blog_Collected,Blog_Comments,Blog_Author_Role,Blog_Author_UniqueId,Blog_Author,'+
+    'Blog_Author_Account,Blog_Author_Avatar,Blog_Createtime,Blog_Updatetime'+
+    ' from blogs where Blog_Id=? and Blog_Status=1'
     chainFecth(sql,Blog_Id).then(data=>{res.send(data)}).catch(err=>{console.log(err)})
 })
 //获取 Blog_Id 对应的评论
@@ -365,11 +372,12 @@ user.post('/searchblogs', (req, res) => {
     let temp = []
     let result = []
     let actions = []
+    const row_names = 'Blog_Id,Blog_Title,Blog_Summary,Blog_Tags,Blog_Class,Blog_Likes,Blog_Views,Blog_Collected,Blog_Comments,Blog_Author,Blog_Createtime,Blog_Updatetime'
     arr.forEach(v=>{
-        if (initend == 0) {
-            sql = '(SELECT * FROM `blogs` WHERE Blog_Id>' + limiter + ' AND Blog_Status=1 AND (Blog_Tags LIKE "%' + v + '%" OR Blog_Title LIKE "%' + v + '%" OR Blog_Summary LIKE "%' + v + '%") ORDER BY Blog_Id DESC) LIMIT ' + needlength + ''
+        if (initend == 0) {   
+            sql = '(SELECT '+ row_names +' FROM `blogs` WHERE Blog_Id>' + limiter + ' AND Blog_Status=1 AND (Blog_Tags LIKE "%' + v + '%" OR Blog_Title LIKE "%' + v + '%" OR Blog_Summary LIKE "%' + v + '%") ORDER BY Blog_Id DESC) LIMIT ' + needlength + ''
         } else if (initend == 1) {
-            sql = '(SELECT * FROM `blogs` WHERE Blog_Id<' + limiter + ' AND Blog_Status=1 AND (Blog_Tags LIKE "%' + v + '%" OR Blog_Title LIKE "%' +v + '%" OR Blog_Summary LIKE "%' + v + '%") ORDER BY Blog_Id DESC) LIMIT ' + needlength + ''
+            sql = '(SELECT '+ row_names +' FROM `blogs` WHERE Blog_Id<' + limiter + ' AND Blog_Status=1 AND (Blog_Tags LIKE "%' + v + '%" OR Blog_Title LIKE "%' +v + '%" OR Blog_Summary LIKE "%' + v + '%") ORDER BY Blog_Id DESC) LIMIT ' + needlength + ''
         }
         var action = ()=>{
             return new Promise((resolve,reject)=>{
