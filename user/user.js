@@ -1233,5 +1233,17 @@ user.get('/getbackgroundimg', (req, res) => {
 })
 
 
+/**
+ * friend link
+ * author hujie
+ * date 2022.05.12
+ */
+
+//获取全部友链 untest
+user.get('/getallfriendlink',(req,res)=>{
+    let sql = '(select * from friendlink where LinkStatus=1) order by id asc'
+    chainFecth(sql)
+    .then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
 
 module.exports = user

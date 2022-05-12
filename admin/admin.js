@@ -2060,4 +2060,64 @@ admin.post('/deleterole', (req, res) => {
     chainFecth(sql,Admin_Role_Id).then(data=>{res.send(data)}).catch(err=>{console.log(err)})
 })
 
+/**
+ * friend link 
+ * author hujie
+ * date 2022.05.12
+ */
+
+
+//获取全部友链 
+admin.post('/getallfriendlink',(req,res)=>{
+    let st = Number(req.body.start)
+    let len = Number(req.body.length)
+    let sql = '(select * from friendlink where LinkStatus=1 order by id asc) limit ?,?'
+    chainFecth(sql,[st,len])
+    .then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
+//全部友链条数 
+admin.get('/getallfriendlinkcount',(req,res)=>{
+    let sql = 'select count(*) as count from friendlink where LinkStatus=1'
+    chainFecth(sql)
+    .then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
+//获取一条友链 
+admin.post('/getfriendlink',(req,res)=>{
+    let id = Number(req.body.id)
+    let sql = 'select * from friendlink where LinkStatus=1 and id=?'
+    chainFecth(sql,id)
+    .then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
+//添加友链 
+admin.post('/addfriendlink', (req, res) => {
+    let FriendWebAvatar = req.body.form.FriendWebAvatar
+    let FriendWebName = req.body.form.FriendWebName
+    let FriendWebDesc = req.body.form.FriendWebDesc
+    let FriendWebLink = req.body.form.FriendWebLink
+    let FriendName = req.body.form.FriendName
+
+    let sql = 'insert into friendlink (FriendWebAvatar,FriendWebName,FriendWebDesc,FriendWebLink,FriendName) values '+
+    ' (?,?,?,?,?)'
+    let mix = [FriendWebAvatar,FriendWebName,FriendWebDesc,FriendWebLink,FriendName]
+    chainFecth(sql,mix).then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
+//删除友链 
+admin.post('/deletefriendlink', (req, res) => {
+    let id = Number(req.body.id)
+    let sql = 'update friendlink set LinkStatus = 0 where id=?'
+    chainFecth(sql,id).then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
+//更新友链 
+admin.post('/updatefriendlink', (req, res) => {
+    let FriendWebAvatar = req.body.form.FriendWebAvatar
+    let FriendWebName = req.body.form.FriendWebName
+    let FriendWebDesc = req.body.form.FriendWebDesc
+    let FriendWebLink = req.body.form.FriendWebLink
+    let FriendName = req.body.form.FriendName
+    let id = Number(req.body.form.id)
+    let mix = [FriendWebAvatar,FriendWebName,FriendWebDesc,FriendWebLink,FriendName,id]
+    let sql = 'update friendlink set FriendWebAvatar=?,FriendWebName=?,FriendWebDesc=?,'+
+    'FriendWebLink=?,FriendName=? where id=?'
+    chainFecth(sql,mix).then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
 module.exports = admin

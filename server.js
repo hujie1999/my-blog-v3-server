@@ -55,10 +55,10 @@ app.use('/api/admin',admin)
 app.use('/api/user',user)
 
 
-http.createServer(app).listen(8889,'0.0.0.0')
-https.createServer(ssl_options,app).listen(8890)
+http.createServer(app).listen(8889)
+// https.createServer(ssl_options,app).listen(8890)
 console.log('HTTP server is running,The port is 8889')
-console.log('HTTPS server is running,The port is 8890')
+// console.log('HTTPS server is running,The port is 8890')
 
 
 
