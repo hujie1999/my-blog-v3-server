@@ -14,9 +14,9 @@ const check = (req,res,next)=>{
     const token = req.headers.authorization
     let presend = {}
     if(token!=undefined && token){
-        
         try {
-            const { create_time,
+            const { 
+                create_time,
                     refresh_time,
                     access_time,
                     forbidden_time 

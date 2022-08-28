@@ -283,7 +283,11 @@ admin.post('/deleteimg', (req, res) => {
             if (fs.existsSync(fullname)) {
                 fs.unlink(fullname, function(err){
                     if(err){
-                        throw err
+                        // throw err
+                        res.send({
+                            message:'文件:'+ImgPath+'临时链接不存在',
+                        })
+                        return
                     }
                     else{
                         res.send({
@@ -1931,7 +1935,11 @@ admin.post('/deletewebsiteimg', (req, res) => {
                 if (fs.existsSync(fullname)) {
                     fs.unlink(fullname, function(err){
                         if(err){
-                            throw err
+                            // throw err
+                            res.send({
+                                message:'文件:'+ImgPath+'临时链接不存在',
+                            })
+                            return
                         }
                         else{
                             res.send({
@@ -2119,5 +2127,73 @@ admin.post('/updatefriendlink', (req, res) => {
     let sql = 'update friendlink set FriendWebAvatar=?,FriendWebName=?,FriendWebDesc=?,'+
     'FriendWebLink=?,FriendName=? where id=?'
     chainFecth(sql,mix).then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
+
+
+
+//访问量操作
+
+
+//某年所有访问数据   入参:2022、2021、...
+admin.post('/getOneYearViewData',(req,res)=>{
+    const year = req.body.year
+    const sql = 'select * from view_data where year(create_time)=?'
+    chainFecth(sql,year)
+        .then(data=>{
+            // console.log(data);
+            if(!data.length){
+                res.send({
+                    data:[],
+                    msg: `${year} 年数据查询成功！无数据！`
+                })
+                return
+            }else{
+                
+                let total_view = []
+                let user_view = []
+                let tourist_view = []
+                data.forEach((v,indedx)=>{
+                    total_view.push([v.create_time,v.total_view])
+                    user_view.push([v.create_time,v.user_view])
+                    tourist_view.push([v.create_time,v.tourist_view])
+                })
+                res.send({
+                    data: {
+                        total_view,
+                        user_view,
+                        tourist_view
+                    },
+                    msg: `${year} 年数据查询成功！`
+                })
+            }
+            
+        })
+        .catch(err=>{
+            console.log(err);
+            res.send({
+                data: [],
+                msg: `${year} 年数据查询失败！`,
+                err: err
+            })
+        })
+})
+//获取昨日访问详情
+admin.get('/getYesterdayViewData',(req,res)=>{
+    const sql = 'select * from view_data order by id desc limit 1'
+    chainFecth(sql)
+    .then(data=>{
+        const sql2 = 'SELECT Viewer_count as count FROM website '
+        chainFecth(sql2).then(dt=>{
+            res.send([...data,...dt])
+        }).catch(err=>{
+            console.log(err)
+            res.end()
+        })
+        
+    })
+    .catch(err=>{
+        console.log('昨日数据查询失败,err==> \n',err);
+        res.end()
+    })
 })
 module.exports = admin
