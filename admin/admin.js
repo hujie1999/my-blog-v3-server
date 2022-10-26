@@ -195,6 +195,7 @@ admin.post('/uploadimg', (req, res) => {
     let maxsize = 5 * 1024 * 1024    //5M
     try{
         form.parse(req, function (err, fields, files) {
+            // console.log('files===>',files);
             // const Blog_Id = fields.Blog_Id
             // const createdfilename = './public/blogimgs/'+Blog_Id
             const createdfilename = './public/blogimgs'
@@ -2195,5 +2196,34 @@ admin.get('/getYesterdayViewData',(req,res)=>{
         console.log('昨日数据查询失败,err==> \n',err);
         res.end()
     })
+})
+
+
+//version update description
+//添加一条版本更新记录
+admin.post('/addversionrecord',(req,res)=>{
+    const {p_id,p_name,p_acc,title,content,create_time} = req.body
+    let sql = `insert into website_version_history
+    (Create_Person_Id,Create_Person_Name,Create_Person_Acc,Description_Title,Description_Content,Description_CreateTime)
+    values (?,?,?,?,?,?)
+    `
+    chainFecth(sql,[p_id,p_name,p_acc,title,content,create_time])
+    .then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
+//获取全部版本更新信息
+admin.get('/getversionrecords',(req,res)=>{
+    // let sql = 'select * from website_version_history where Description_Status=1 order by id desc'
+    let sql = 'select * from website_version_history order by id desc'
+    chainFecth(sql)
+    .then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
+//更新记录
+admin.post('/updateversionrecord',(req,res)=>{
+    const {id,title,content,create_time,status} = req.body
+    const sql = `update website_version_history set 
+    Description_Title=?,Description_Content=?,Description_CreateTime=?,Description_Status=? 
+    where id =? `
+    chainFecth(sql,[title,content,create_time,status,id])
+    .then(data=>{res.send(data)}).catch(err=>{console.log(err)})
 })
 module.exports = admin

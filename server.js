@@ -30,8 +30,8 @@ const allowedItem = (origin)=>{
 //设置跨域访问
 app.all('*', function (req, res, next) {
     let origin = req.headers.origin
-    res.header("Access-Control-Allow-Origin", allowedItem(origin));
-    // res.header("Access-Control-Allow-Origin", "*");
+    // res.header("Access-Control-Allow-Origin", allowedItem(origin));
+    res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Credentials", true);
     res.header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Authorization, Accept, X-Requested-With");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, HEAD, DELETE, OPTIONS");
@@ -50,7 +50,7 @@ app.use(bodyParser.urlencoded({extended: true})) //解析post数据
 app.use(express.static('public'))
 
 //访问数据处理
-const touristSet = new Set(); //访问人数
+const touristSet = new Set(); //游客访问人数
 const userSet = new Set(); //注册用户访问数
 
 app.use((req, res, next) => {

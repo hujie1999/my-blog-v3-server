@@ -267,7 +267,7 @@ user.post('/blogcomments', (req, res) => {
     let st = Number(req.body.Start)
     let ln = Number(req.body.Length)
     //先获取第一层评论
-    sql = '(select * from comments_blogs where Blog_Id = ? and Comment_Examined !=2 and Comment_Level=1  order by Id desc )limit ?,?'
+    sql = '(select * from comments_blogs where Blog_Id = ? and Comment_Status = 1 and Comment_Examined !=2 and Comment_Level=1  order by Id desc )limit ?,?'
     chainFecth(sql,[Blog_Id,st,ln])
     .then(data=>{
         
@@ -279,14 +279,14 @@ user.post('/blogcomments', (req, res) => {
         // let userinfosql = 'SELECT User_Nickname,User_Account,User_Avatar,Role FROM user_table WHERE User_UniqueId=?'
         
         //在根据commentid 循环查询所对应的二级回复
-        let innersql = 'select * from comments_blogs where Root_Comment_Id = ? and Comment_Examined !=2'
+        let innersql = 'select * from comments_blogs where Root_Comment_Id = ? and Comment_Status = 1 and Comment_Examined !=2'
         first.forEach((v,index)=>{
-            if(v.Comment_Status==0){
-                v.Comment_Content = '该评论已被删除'
-            }
-            else if(v.Comment_Status==2){
-                v.Comment_Content = '该评论已被冻结'
-            }
+            // if(v.Comment_Status==0){
+            //     v.Comment_Content = '该评论已被删除'
+            // }
+            // else if(v.Comment_Status==2){
+            //     v.Comment_Content = '该评论已被冻结'
+            // }
             
             
             var action = ()=>{
@@ -317,8 +317,8 @@ user.post('/blogcomments', (req, res) => {
 //获取 Blog_Id 对应的count
 user.post('/blogcommentscount', (req, res) => {
     Blog_Id = req.body.Blog_Id
-    let sql = 'select count(*) as count from comments_blogs where Blog_Id = ? and Comment_Examined !=2 and Comment_Level=1'
-    let sql2 = 'select count(*) as count from comments_blogs where Blog_Id = ? and Comment_Examined !=2'
+    let sql = 'select count(*) as count from comments_blogs where Blog_Id = ? and Comment_Status = 1 and Comment_Examined !=2 and Comment_Level=1'
+    let sql2 = 'select count(*) as count from comments_blogs where Blog_Id = ? and Comment_Status = 1 and Comment_Examined !=2'
     chainFecth(sql,Blog_Id).then(data=>{
         chainFecth(sql2,Blog_Id).then(dt=>{
             res.send({
@@ -629,14 +629,14 @@ user.post('/messagecomments', (req, res) => {
         //在根据commentid 循环查询所对应的二级回复
         let first = data
         let actions = []
-        let innersql = 'select * from comments_message where Root_Comment_Id = ? and Comment_Examined !=2'
+        let innersql = 'select * from comments_message where Root_Comment_Id = ? and Comment_Status=1 and Comment_Examined !=2'
         first.forEach((v,index)=>{
-            if(v.Comment_Status==0){
-                v.Comment_Content = '该评论已被删除'
-            }
-            else if(v.Comment_Status==2){
-                v.Comment_Content = '该评论已被冻结'
-            }
+            // if(v.Comment_Status==0){
+            //     v.Comment_Content = '该评论已被删除'
+            // }
+            // else if(v.Comment_Status==2){
+            //     v.Comment_Content = '该评论已被冻结'
+            // }
             var action = ()=>{
                 return new Promise((resolve,reject)=>{
                     chainFecth(innersql,v.Comment_Id).then(dt=>{
@@ -1213,8 +1213,15 @@ user.post('/getunreadnoticount',(req,res)=>{
 
 //归档
 //获取博客 id，title，createtime
-user.get('/getarrangedblogs',(req,res)=>{
+user.get('/getarchives',(req,res)=>{
     let sql = '(SELECT Blog_Id,Blog_Title,Blog_Createtime FROM `blogs` WHERE Blog_Status=1 ) ORDER BY Blog_Id DESC'
+    chainFecth(sql).then(data=>{
+        res.send(data)
+    }).catch(err=>{console.log(err)})
+})
+//top views blog
+user.get('/gettopviewblogs',(req,res)=>{
+    let sql = '(SELECT Blog_Id,Blog_Title,Blog_Views,Blog_Createtime FROM `blogs` WHERE Blog_Status=1  ORDER BY Blog_Views DESC) Limit 10'
     chainFecth(sql).then(data=>{
         res.send(data)
     }).catch(err=>{console.log(err)})
@@ -1242,6 +1249,15 @@ user.get('/getbackgroundimg', (req, res) => {
 //获取全部友链 untest
 user.get('/getallfriendlink',(req,res)=>{
     let sql = '(select * from friendlink where LinkStatus=1) order by id asc'
+    chainFecth(sql)
+    .then(data=>{res.send(data)}).catch(err=>{console.log(err)})
+})
+
+//version update description
+
+//获取版本更新信息 Description_Status=1 
+user.get('/getversionrecords',(req,res)=>{
+    const sql = 'select * from website_version_history where Description_Status=1 order by id desc'
     chainFecth(sql)
     .then(data=>{res.send(data)}).catch(err=>{console.log(err)})
 })
