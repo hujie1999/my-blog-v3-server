@@ -1,6 +1,6 @@
 
 const preset = {
-    secret : 'suibianxiede123',
+    secret : 'suibianxiede',
 
     //token 刷新时间 单位：秒
     refresh_time : 60*10,
