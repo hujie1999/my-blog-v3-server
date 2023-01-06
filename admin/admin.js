@@ -192,7 +192,8 @@ const execUpdateImage = async function(maxsize,files,createdfilename,res){
 //上传图片
 admin.post('/uploadimg', (req, res) => {
     var form = new formidable.IncomingForm();               
-    let maxsize = 5 * 1024 * 1024    //5M
+    // let maxsize = 5 * 1024 * 1024    //5M
+    const maxsize = 15 * 1024 * 1024    //15M
     try{
         form.parse(req, function (err, fields, files) {
             // console.log('files===>',files);
